@@ -2,7 +2,8 @@ import styled from "styled-components";
 import { auth, provider } from "../firebase";
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { selectUserName, selectUserEmail, selectUserphoto, setUserLoginDetails } from '../featuers/users/userSlice';
+import { selectUserName, selectUserEmail, selectUserPhoto, setUserLoginDetails } from '../featuers/users/userSlice';
+import { useEffect } from "react";
 
 
 const Header = (props) => {
@@ -10,8 +11,17 @@ const Header = (props) => {
     const history = useHistory();
     const username = useSelector(selectUserName);
     const useremail = useSelector(selectUserEmail);
-    const userphoto = useSelector(selectUserphoto);
+    const userphoto = useSelector(selectUserPhoto);
 
+    useEffect(() => {
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            setUser(user);
+            history.push("/home");
+          }
+        });
+      }, [username]);
+    
     const setUser = (user) => {
         dispatch(setUserLoginDetails({
             name: user.displayName,
@@ -20,8 +30,6 @@ const Header = (props) => {
         })
         );
     };
-
-    console.log(userphoto);
 
     const handelAuth = () => {
         auth.signInWithPopup(provider).then((result) => {
