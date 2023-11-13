@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { auth, provider } from "../firebase";
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { selectUserName, selectUserEmail, selectUserPhoto, setUserLoginDetails } from '../featuers/users/userSlice';
+import { selectUserName, selectUserEmail, selectUserPhoto, setUserLoginDetails, setSignOutState } from '../featuers/users/userSlice';
 import { useEffect } from "react";
 
 
@@ -32,12 +32,21 @@ const Header = (props) => {
     };
 
     const handelAuth = () => {
-        auth.signInWithPopup(provider).then((result) => {
-            setUser(result.user);
-            // console.log(result.user);
-        }).catch((error) => {
-            alert(error.message)
-        })
+        if(!username){
+            auth.signInWithPopup(provider).then((result) => {
+                setUser(result.user);
+                history.push("/home");
+                window.location.reload(false);
+            }).catch((error) => {
+                alert(error.message)
+            })
+        }else if(username){
+            auth.signOut().then(()=>{
+                dispatch(setSignOutState());
+                history.push('/');
+                window.location.reload(false);
+            }).catch((err)=>alert(err.message));
+        }
     }
     return (
         <Nav>
@@ -72,7 +81,10 @@ const Header = (props) => {
                             <span>SERIES</span>
                         </a>
                     </NavMenu>
-                    <UserImg src = {userphoto} alt={username} />
+                    <SignOut>
+                        <UserImg src = {userphoto} alt={username} />
+                        <DropDown><span onClick={handelAuth}>Sign Out</span></DropDown>
+                    </SignOut>
                 </>}
             {/* //<Login onClick={handelAuth}>Login</Login> */}
         </Nav>
@@ -188,4 +200,42 @@ transition: all 0.2s ease 0s;
 const UserImg = styled.img`
     height: 100%;
 `; 
+
+const DropDown = styled.div`
+    position: absolute;
+    top: 48px;
+    right: 0px;
+    background: rgb(19, 19, 19);
+    border: 1px solid rgba(151, 151, 151, 0.34);
+    border-radius: 4px;
+    box-shadow: rgb(0 0 0 / 50%) 0px 0px 18px 0px;
+    padding: 8px;
+    font-size: 14px;
+    letter-spacing: 3px;
+    width: 100px;
+    opacity: 0;
+`
+const SignOut = styled.div`
+  position: relative;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+
+  ${UserImg}{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+
+  &:hover{
+    ${DropDown}{
+        opacity: 1;
+        transition-duration: 1s;
+    }
+  }
+`;
+
 export default Header;
