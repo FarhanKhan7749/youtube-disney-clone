@@ -1,33 +1,24 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
+import { useSelector } from "react-redux";
+import { selectTrendings } from "../featuers/movie/movieSlice";
+
 
 const Trendings = (props) => {
-    return(<Container>
+    const movies = useSelector(selectTrendings);
+
+    return (<Container>
         <h4>Trendings</h4>
         <Content>
-            <Wrap>
-                <Link to='/'>
-                    <img src='/images/slider-badag.jpg' alt='' />
-                </Link>
-            </Wrap>
-            
-            <Wrap>
-                <Link to='/'>
-                    <img src='/images/slider-badag.jpg' alt='' />
-                </Link>
-            </Wrap>
-            
-            <Wrap>
-                <Link to='/'>
-                    <img src='/images/slider-badag.jpg' alt='' />
-                </Link>
-            </Wrap>
-            
-            <Wrap>
-                <Link to='/'>
-                    <img src='/images/slider-badag.jpg' alt='' />
-                </Link>
-            </Wrap>
+            {movies &&
+                movies.map((movie, key) => (
+                    <Wrap key={key}>
+                        {movie.id}
+                        <Link to={`/detail/` + movie.id}>
+                            <img src={movie.cardImg} alt={movie.title} />
+                        </Link>
+                    </Wrap>
+                ))}
         </Content>
     </Container>);
 }

@@ -15,43 +15,43 @@ const Home = (props) => {
     const dispatch = useDispatch();
     const username = useSelector(selectUserName);
 
-    let recommends = [];
-    let newDisney = [];
-    let originals = [];
-    let trendings = [];
-
     useEffect(() => {
+        let recommends = [];
+        let newDisney = [];
+        let originals = [];
+        let trendings = [];
+
         db.collection('movies').onSnapshot((snapshot) => {
             snapshot.docs.map((doc) => {
-                console.log(recommends);
+                // console.log(recommends);
                 switch (doc.data().type) {
                     case 'recommend':
-                        recommends = [...recommends,{ id: doc.id, ...doc.data() }];
+                        recommends = [...recommends, { id: doc.id, ...doc.data() }];
                         break;
                     case 'new':
-                        newDisney = [...newDisney,{ id: doc.id, ...doc.data() }];
+                        newDisney = [...newDisney, { id: doc.id, ...doc.data() }];
                         // newDisney.push({ id: doc.id, ...doc.data() });
                         break;
                     case 'trending':
-                        trendings = [...trendings,{ id: doc.id, ...doc.data() }];
+                        trendings = [...trendings, { id: doc.id, ...doc.data() }];
 
                         // originals.push({ id: doc.id, ...doc.data() });
                         break;
                     case 'original':
-                        originals = [...originals,{ id: doc.id, ...doc.data() }];
+                        originals = [...originals, { id: doc.id, ...doc.data() }];
                         // trendings.push({ id: doc.id, ...doc.data() });
                         break;
                     default:
                         return null;
                 }
             });
+            dispatch(setMovies({
+                recommends: recommends,
+                newDisney: newDisney,
+                original: originals,
+                trendings: trendings,
+            }));
         });
-        dispatch(setMovies({
-            recommends: recommends,
-            newDisney: newDisney,
-            original: originals,
-            trendings: trendings,
-        }));
     }, [username]);
 
     return (
