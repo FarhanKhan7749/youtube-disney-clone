@@ -1,14 +1,14 @@
 import styled from "styled-components";
 import { auth, provider } from "../firebase";
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { selectUserName, selectUserEmail, selectUserPhoto, setUserLoginDetails, setSignOutState } from '../featuers/users/userSlice';
 import { useEffect } from "react";
 
 
 const Header = (props) => {
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const username = useSelector(selectUserName);
     const useremail = useSelector(selectUserEmail);
     const userphoto = useSelector(selectUserPhoto);
@@ -17,7 +17,7 @@ const Header = (props) => {
         auth.onAuthStateChanged(async (user) => {
           if (user) {
             setUser(user);
-            history.push("/home");
+            navigate("/home");
           }
         });
       }, [username]);
@@ -35,16 +35,14 @@ const Header = (props) => {
         if(!username){
             auth.signInWithPopup(provider).then((result) => {
                 setUser(result.user);
-                history.push("/home");
-                window.location.reload(false);
+                navigate("/home");
             }).catch((error) => {
                 alert(error.message)
             })
         }else if(username){
             auth.signOut().then(()=>{
                 dispatch(setSignOutState());
-                history.push('/');
-                window.location.reload(false);
+                navigate('/');
             }).catch((err)=>alert(err.message));
         }
     }
